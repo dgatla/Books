@@ -1,9 +1,10 @@
-import { Book, markRead, myBooks, removeBook } from "./book.js";
+import { Library } from "./book-class.js";
+
 
 document.addEventListener("DOMContentLoaded", () => {
     let booklist = document.querySelector("#booklist");
-
-    for (let book of myBooks) {
+    let library = new Library();
+    for (let book of library.myBooks) {
         let card = createBookCard(book)
         booklist.appendChild(card);
     }
@@ -20,8 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault()
         let data = new FormData(form)
 
-        let newBook = new Book(data.get("title"), data.get("author"), parseInt(data.get("pages"), 10), data.get("read") === "on", crypto.randomUUID())
-        myBooks.push(newBook);
+        let newBook = library.addBookToMyBooks(data.get("title"), data.get("author"), parseInt(data.get("pages"), 10), data.get("read") === "on")
         let newBookCard = createBookCard(newBook)
         booklist.appendChild(newBookCard);
         modalBackdrop.classList.toggle("d-none")
@@ -56,12 +56,12 @@ document.addEventListener("DOMContentLoaded", () => {
         if (e.target.classList.contains("delete-button")) {
             const uuid = e.target.closest(".card").dataset.uuid;
             booklist.removeChild(e.target.closest(".card"))
-            removeBook(uuid)
+            library.removeBook(uuid)
         }
         else if (e.target.classList.contains("mark-read")) {
             const uuid = e.target.closest(".card").dataset.uuid;
             let card = e.target.closest(".card")
-            let status = markRead(uuid)
+            let status = library.markRead(uuid)
             const readPara = card.querySelector(".book-read");
             readPara.textContent = `Read: ${status ? "Yes" : "No"}`;
             e.target.textContent = `${status ? "Mark as unread":"Mark read"}`
